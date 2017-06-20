@@ -1,0 +1,29 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/dev
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - run:
+          name: update-npm-and-yarn
+          command: 'sudo npm install -g npm@latest yarn@latest'
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: yarn build-release
+          command: yarn build-release
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+            - ~/.cache/yarn
+workflows:
+  version: 2
+  workflow-default:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: circleci
