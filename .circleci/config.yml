@@ -1,7 +1,26 @@
 version: 2
 jobs:
   build:
-
+    working_directory: ~/dev
+    docker:
+      - image: ubuntu:14.04
+    steps:
+      - checkout
+      - run:
+          name: build
+          command: 'mvn clean compile'
+      - run:
+          name: test
+          command: 'mvn test'
+      - save_cache:
+          key: dependency-cache-{{ .Revision }}
+          paths:
+            - ~/.m2
+      - store_artifacts:
+          path: /tmp/artifacts
+          destination: build
+      - store_test_results:
+          path: /tmp/test-reports
 workflows:
   version: 2
   workflow-default:
